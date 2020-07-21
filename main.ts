@@ -1,12 +1,20 @@
 namespace SpriteKind {
     export const poison = SpriteKind.create()
+    export const bomb = SpriteKind.create()
 }
 sprites.onCreated(SpriteKind.Projectile, function (sprite) {
     info.changeScoreBy(1)
 })
+sprites.onOverlap(SpriteKind.Player, SpriteKind.bomb, function (sprite, otherSprite) {
+    superBomb.destroy(effects.disintegrate, 100)
+    for (let index = 0; index < 10; index++) {
+        papple.destroy(effects.spray, 100)
+        apple.destroy(effects.spray, 100)
+    }
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
     info.changeLifeBy(1)
-    mySprite3.destroy(effects.confetti, 500)
+    otherSprite.destroy(effects.confetti, 100)
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Projectile, function (sprite, otherSprite) {
     info.changeLifeBy(-1)
@@ -17,8 +25,14 @@ info.onLifeZero(function () {
     game.reset()
     mySprite.destroy(effects.spray, 500)
 })
-let apple: Sprite = null
+sprites.onOverlap(SpriteKind.Player, SpriteKind.poison, function (sprite, otherSprite) {
+    info.changeLifeBy(-3)
+    otherSprite.destroy(effects.confetti, 100)
+})
 let mySprite3: Sprite = null
+let apple: Sprite = null
+let papple: Sprite = null
+let superBomb: Sprite = null
 let mySprite: Sprite = null
 music.setTempo(400)
 info.setScore(0)
@@ -207,8 +221,8 @@ game.onUpdateInterval(2000, function () {
     mySprite3.setKind(SpriteKind.Food)
     mySprite3.x = Math.randomRange(0, scene.screenWidth())
 })
-game.onUpdateInterval(750, function () {
-    apple = sprites.createProjectileFromSide(img`
+game.onUpdateInterval(500, function () {
+    papple = sprites.createProjectileFromSide(img`
 c c c c c c c c c c c c c c c c c c c c 
 c c c c c c c c c c c c c c c c c c c c 
 c c c c c c c c c c c c c c c c c c c c 
@@ -230,7 +244,34 @@ c c c c c c c c c c c c c c c c c c c c
 c c c c c c c c c c c c c c c c c c c c 
 c c c c c c c c c c c c c c c c c c c c 
 `, 0, 100)
-    apple.x = Math.randomRange(0, scene.screenWidth())
+    papple.setKind(SpriteKind.poison)
+    papple.x = Math.randomRange(0, scene.screenWidth())
+})
+game.onUpdateInterval(5000, function () {
+    superBomb = sprites.createProjectileFromSide(img`
+. . . . . . . . . . 2 2 . . . . . . . . 
+. . . . . . . . . . e . . . . . . . . . 
+. . . . . . . f f f f f f f . . . . . . 
+. . . . . f f f f f f f f f f f . . . . 
+. . . . f f f f f f f f f f f f f . . . 
+. . . . f f f f f f f f f f f f f . . . 
+. . . f f f f f f f f f f f f f f f . . 
+. . . f f f f f f f f f f f f f f f . . 
+. . . f f f f f f f f f f f f f f f . . 
+. . . f f f f f f f f f f f f f f f . . 
+. . . f f f f f f f f f f f f f f f . . 
+. . . f f f f f f f f f f f f f f f . . 
+. . . f f f f f f f f f f f f f f f . . 
+. . . . f f f f f f f f f f f f f . . . 
+. . . . f f f f f f f f f f f f f . . . 
+. . . . . f f f f f f f f f f f . . . . 
+. . . . . . . f f f f f f f . . . . . . 
+. . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . 
+`, 0, 100)
+    superBomb.setKind(SpriteKind.bomb)
+    superBomb.x = Math.randomRange(0, scene.screenWidth())
 })
 forever(function () {
     music.playMelody("G B A G C5 B A B ", 120)
